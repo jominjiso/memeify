@@ -12,7 +12,7 @@ class User(db.Model,UserMixin):
     id = db.Column(db.Integer,primary_key = True)
     username = db.Column(db.String(50),nullable = False)
     email = db.Column(db.String(60),nullable = False)
-    password = db.Column(db.String(50),nullable = False)
+    password = db.Column(db.String(225),nullable = False)
     post = db.relationship('Post',backref='user',lazy=True)
     favorited_posts = db.relationship('Post',backref='fav_by',secondary=favorites,lazy=True)
 
