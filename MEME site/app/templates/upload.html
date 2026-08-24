@@ -1,0 +1,25 @@
+{% extends 'main.html' %}
+{% block title %}Memeify-upload{% endblock %}
+{% block head %}
+<link rel="stylesheet" href="/static/css/upload.css">
+{% endblock %}
+
+{% block content %}
+<div class="container d-flex justify-content-center mt-5">
+    <img src="/static/imgs/deven-upload.gif" style="max-width: 100%;" alt="Did You Upload Today!" >
+</div>
+<div class="container mt-5 d-flex justify-content-center">
+    <form action="{{url_for('home.upload')}}" method='post' class="bg-warning p-3 rounded d-flex flex-column mb-5" style="max-width: 500px;" enctype="multipart/form-data">
+        <div class="form-floating mb-2 mt-2 ">
+            <input type="text" class="form-control mb-3" placeholder="Enter Title" id="title" name="title" required="required">
+            <label for="title">Title</label>
+         </div>
+        <div class="mb-3">
+            <label for="formFile" class="form-label">Choose file</label>
+            <input class="form-control" type="file" id="formFile" name="meme">
+        </div>
+            <input type="submit" value="Upload" id="p-btn" class="btn">
+    </form>
+</div>
+
+{% endblock %}

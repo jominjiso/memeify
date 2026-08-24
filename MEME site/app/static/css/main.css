@@ -1,0 +1,25 @@
+#logo{
+    color: #FFF000;
+    font-family: 'Edu NSW ACT Cursive', cursive;
+    font-weight: 800;
+    font-size: 2.5rem;
+}
+#navbarSupportedContent{
+    color: white;
+    text-decoration: none;
+    font-size: larger;
+    padding: 1.45rem;
+    font-weight: 700;
+    color: #FFF000;
+}
+.navbar-toggler-icon{
+    filter: invert(1);
+
+}
+#dots{
+    color: #FFF000;
+}
+
+#butn{
+    margin-right: -2.5rem;
+}

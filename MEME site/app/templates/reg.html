@@ -1,0 +1,43 @@
+{% extends 'main.html' %}
+{% block title %}Memeify-signup{% endblock %}
+{% block head %}
+<link rel="stylesheet" href="/static/css/login.css">
+{% endblock %}
+
+{% block content %}
+<!-- Centered container with full viewport height -->
+<div class="container min-vh-100 d-flex align-items-center">
+    <!-- Row aligns both columns along the center axis -->
+    <div class="row w-100 align-items-center ">
+        
+        <!-- Left Side: Image -->
+        <div class="col-12 col-md-6 text-center zoom-only-image">
+            <img src="/static/imgs/Login.jpeg" alt="Login Graphic" class="img-fluid rounded" style="max-height: 80rem;">
+        </div>
+
+        <!-- Right Side: Login Card -->
+        <div class="col-12 col-md-6 col-lg-5 d-flex justify-content-around">
+            <div class="card bg-black p-4 text-white w-100 border-secondary" style="max-width: 450px; max-height: 500px;">
+                <div class="card-body">
+                    <div class="card-title text-center mb-4">
+                       <div class="container"><h1 id="lgn-logo" class="text-warning">Memefiy.</h1></div>
+                    </div>
+                    
+                    <form action="{{ url_for('auth.register')}}" method="post">
+                        <div class="mb-3">
+                            <input type="text" placeholder="Username" name="username" class="form-control mb-3" id="textorder">
+                            <input type="email" id="textorder" class="form-control mb-3" placeholder="Email" name="email" required="required">
+                            <input type="password" id="textorder" class="form-control mb-4" placeholder="Password" name="password" required="required">
+                        </div>
+                        <div class="text-center">
+                            <input type="submit" id="lgbtn" value="Register" class="btn btn-warning text-black w-50 fw-bold">
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+{% endblock %}

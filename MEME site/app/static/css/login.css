@@ -1,0 +1,22 @@
+sec-body{
+    display: flex;
+    background-color: aqua;
+    align-items: center;
+}
+#lgn-logo{
+    color: #FFF000;
+    font-size: clamp(2rem,2.5rem,4rem);
+    font-family: 'Edu NSW ACT Cursive', cursive;
+    font-weight: 800;
+    padding-bottom: 3rem;
+    overflow: hidden;
+}
+
+#textorder{
+    font-weight: 600;
+}
+#lgbtn{
+    background-color: #FFF000;
+    font-weight: 600;
+    
+}
