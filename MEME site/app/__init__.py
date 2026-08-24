@@ -39,7 +39,7 @@ def create_app():
     login_manager.login_message = "You must be logged in to view this content."
     login_manager.login_message_category = "warning"
 
-    from app.models import User, Post, Favorite
+    from app.models import User, Post,favorites
     @login_manager.user_loader
     def load_user(id):
         return User.query.get(id)
