@@ -9,13 +9,6 @@ import cloudinary.uploader
 
 home = Blueprint('home',__name__,template_folder='templates',static_folder='static',static_url_path='/app')
 
-cloudinary.config(
-    cloud_name = "qpf3nomd",
-    api_key = "865614548478618",
-    api_secret = "jyin_T9TRUI0E1HPv5qDbepmV10",
-    secure = True
-)
-
 
 @home.route('/')
 @login_required
@@ -32,9 +25,9 @@ from flask_login import current_user
 
 # Configure Cloudinary credentials
 cloudinary.config(
-    cloud_name = "YOUR_CLOUD_NAME",
-    api_key = "YOUR_API_KEY",
-    api_secret = "YOUR_API_SECRET",
+    cloud_name = "qpf3nomd",
+    api_key = "865614548478618",
+    api_secret = "jyin_T9TRUI0E1HPv5qDbepmV10",
     secure = True
 )
 
