@@ -3,9 +3,19 @@ from flask_login import login_required,current_user,logout_user
 import os,uuid
 from app.models import Post
 from app import db
+import cloudinary
+import cloudinary.uploader
 
 
 home = Blueprint('home',__name__,template_folder='templates',static_folder='static',static_url_path='/app')
+
+cloudinary.config(
+    cloud_name = "qpf3nomd",
+    api_key = "865614548478618",
+    api_secret = "jyin_T9TRUI0E1HPv5qDbepmV10",
+    secure = True
+)
+
 
 @home.route('/')
 @login_required
@@ -13,32 +23,52 @@ def index():
     posts = Post.query.all()   
     return render_template('home.html',posts=posts)
 
-@home.route('/upload',methods=['GET','POST'])
+import os
+import cloudinary
+import cloudinary.uploader
+from flask import request, render_template, redirect, url_for, flash, current_app
+from flask_login import current_user
+# Make sure to import your db and Post model at the top of your file
+
+# Configure Cloudinary credentials
+cloudinary.config(
+    cloud_name = "YOUR_CLOUD_NAME",
+    api_key = "YOUR_API_KEY",
+    api_secret = "YOUR_API_SECRET",
+    secure = True
+)
+
+@home.route('/upload', methods=['GET', 'POST'])
 def upload():
-        if request.method == 'GET':
-            return render_template('upload.html')
-        elif request.method == 'POST':
-            title = request.form.get('title')
-            meme = request.files.get('meme')
+    if request.method == 'GET':
+        return render_template('upload.html')
+    
+    elif request.method == 'POST':
+        title = request.form.get('title')
+        meme = request.files.get('meme')
 
-            meme_filename = None
+        meme_url = None
 
-            if meme and meme.filename != '':
-                ext = os.path.splitext(meme.filename)[1]
+        if meme and meme.filename != '':
+            ext = os.path.splitext(meme.filename)[1]
+            allowed_ext = ['.jpg','.jpeg','.png','.webp','.heic','.jfif']
 
-                allowed_ext = ['.jpg','.jpeg','.png','.webp','.heic','.jfif']
-
-                if ext.lower() in allowed_ext:
-                    meme_filename = f'{uuid.uuid4().hex}{ext}'
-                    save_path = os.path.join(current_app.root_path,'static','imgs','memes',meme_filename)
-                    meme.save(save_path)
-                else:
-                    flash('Only Images!','danger')
-                    return redirect(url_for('home.upload')) 
-            post =  Post(title=title,meme=meme_filename,created_user=current_user.id)
-            db.session.add(post)
-            db.session.commit()
-            return redirect(url_for('home.index'))
+            if ext.lower() in allowed_ext:
+                # Upload the file directly to Cloudinary
+                upload_result = cloudinary.uploader.upload(meme)
+                
+                # Get the permanent HTTPS URL from Cloudinary
+                meme_url = upload_result.get('secure_url')
+            else:
+                flash('Only Images!', 'danger')
+                return redirect(url_for('home.upload')) 
+        
+        # Save the full URL directly to the database instead of a filename
+        post = Post(title=title, meme=meme_url, created_user=current_user.id)
+        db.session.add(post)
+        db.session.commit()
+        
+        return redirect(url_for('home.index'))
 
 @home.route('/del_post/<int:id>')
 def del_post(id):
