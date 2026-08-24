@@ -11,6 +11,11 @@ def create_app():
     app = Flask(__name__)
     app.config['SECRET_KEY'] = '5df0312afecb6e105f83d421e67762f4'
     
+    # Configure upload folder path
+    upload_folder = os.path.join(app.root_path, 'static', 'uploads')
+    os.makedirs(upload_folder, exist_ok=True)
+    app.config['UPLOAD_FOLDER'] = upload_folder
+    
     # Check for Render's DATABASE_URL first; fall back to SQLite for local development
     database_url = os.environ.get('DATABASE_URL')
     if database_url:
@@ -31,10 +36,10 @@ def create_app():
     login_manager = LoginManager()
     login_manager.init_app(app)
     login_manager.login_view = 'auth.login'
-    login_message = "You must be logged in to view this content."
+    login_manager.login_message = "You must be logged in to view this content."
     login_manager.login_message_category = "warning"
 
-    from app.models import User
+    from app.models import User, Post, Favorite
     @login_manager.user_loader
     def load_user(id):
         return User.query.get(id)
