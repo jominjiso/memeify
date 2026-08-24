@@ -55,10 +55,9 @@
                     </a>
 
                     <button type="button" 
-                            class="btn border-0 share-btn" 
-                            data-title="{{ post.title }}" 
-                            data-url="{{ url_for('static', filename='imgs/memes/' + post.meme) }}">
-                        <i class="fa-solid fa-share" style="color: blue;"></i>
+                        class="btn border-0 share-btn" 
+                        data-title="{{ post.title }}" 
+                        data-url="{{ post.meme }}">
                     </button>
                 </div>
             </div>
@@ -74,26 +73,27 @@ document.addEventListener("DOMContentLoaded", function () {
             e.preventDefault();
 
             const title = this.getAttribute("data-title");
-            const relativeUrl = this.getAttribute("data-url");
-            const fullUrl = window.location.origin + relativeUrl;
+            const imageUrl = this.getAttribute("data-url"); // Directly holds the Cloudinary URL
 
             if (navigator.share) {
                 navigator.share({
                     title: title,
                     text: `Check out this meme: "${title}"`,
-                    url: fullUrl
+                    url: imageUrl
                 }).catch(err => {
                     if (err.name !== 'AbortError') console.error("Share error:", err);
                 });
             } else if (navigator.clipboard) {
-                navigator.clipboard.writeText(fullUrl).then(() => {
+                navigator.clipboard.writeText(imageUrl).then(() => {
                     alert("Meme link copied to clipboard!");
                 });
             } else {
-                alert("Share link: " + fullUrl);
+                alert("Share link: " + imageUrl);
             }
         });
     });
 });
 </script>
+
+
 {% endblock %}
