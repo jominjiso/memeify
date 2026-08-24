@@ -36,10 +36,7 @@
                 </div>
 
                 <div style="height: 320px; background-color: black;" class="d-flex align-items-center justify-content-center overflow-hidden">
-                    <img src="{{ url_for('static', filename='imgs/memes/' + post.meme) }}" 
-                         class="w-100 h-100" 
-                         style="object-fit: contain;" 
-                         alt="{{ post.title }}">
+                    <img src="{{ post.meme }}" class="card-img-top" alt="{{ post.title }}">
                 </div>
 
                 <div class="card-footer d-flex justify-content-between bg-white">
