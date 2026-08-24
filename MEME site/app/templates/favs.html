@@ -6,66 +6,74 @@
 {% block content %}
 
 {% if post %}
-<div class="container mt-0 my-4">
-    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
-        {% for post in posts %}
-        <div class="col">
-            <div class="card">
-                <div class="card-header d-flex bg-white">
-                    {% if current_user.id == post.user.id %}
-                        <div class="container d-flex p-0">
-                            <p style="font-weight: 700;">{{post.title}}</p>
-                            <p style="opacity: 0.7; margin-left: 5px; margin-right: 5px;">•</p>
-                            <p style="opacity: 0.7;">@{{post.user.username}}</p> 
+    <div class="container mt-5 my-4" >
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+            {% for post in post %}
+                    <div class="col">
+                        <div class="card">
+                            <div class="card-header d-flex bg-white">
+                                {% if current_user.id == post.user.id %}
+                                    <div class="container d-flex p-0">
+                                        <p style="font-weight: 700;">{{post.title}}</p>
+                                        <p style="opacity: 0.7; margin-left: 5px; margin-right: 5px;">•</p>
+                                        <p style="opacity: 0.7;">@{{post.user.username}}</p> 
+                                    </div>
+                                {% else %}
+                                    <div class="container d-flex p-0 justify-content-between">
+                                        <p style="font-weight: 700;">{{post.title}}</p>
+                                        <p style="opacity: 0.7;">@{{post.user.username}}</p> 
+                                    </div>
+                                {% endif %}
+                                
+                                {% if current_user.id == post.user.id %} 
+                                    <a style="color: red;" href="{{url_for('home.del_post',id = post.id)}}"><div class="btn"><i class="fa-solid fa-trash"></i></div></a>
+                                {% endif %}
+                            </div>
+                            <div style="height: 320px; background-color: black;" class="d-flex align-items-center justify-content-center overflow-hidden">
+                                <img src="{{ post.meme }}" class="card-img-top" alt="{{ post.title }}">
+                            </div>
+                            <div class="card-footer d-flex justify-content-between bg-white">
+                                <a href="{{url_for('home.fav',post_id = post.id)}}">
+                                    <button class="btn" onclick="toggleFavorite(this)">
+                                        {% if post in current_user.favorited_posts %}
+                                            <i class="fa-solid fa-heart" style="color: red;"></i>
+                                        {% else %}
+                                            <i class="fa-regular fa-heart" style="color: red;"></i>
+                                        {% endif %}
+                                    </button>
+                                </a>
+                                <a href="{{url_for('home.download', post_id=post.id)}}">
+                                    <div class="btn"><i class="fa-solid fa-download" style="color: green;"></i></div>
+                                </a>
+                                <button type="button" 
+                                    class="btn border-0 share-btn" 
+                                    data-title="{{ post.title }}" 
+                                    data-url="{{ post.meme }}">
+                                    <i class="fa-solid fa-share" style="color: blue;"></i>
+                                </button>  
+                            
+                            
+                            </div>
+                            
                         </div>
-                    {% else %}
-                        <div class="container d-flex p-0 justify-content-between">
-                            <p style="font-weight: 700;">{{post.title}}</p>
-                            <p style="opacity: 0.7;">@{{post.user.username}}</p> 
-                        </div>
-                    {% endif %}
-                    
-                    {% if current_user.id == post.user.id %} 
-                        <a style="color: red;" href="{{url_for('home.del_post', id=post.id)}}">
-                            <div class="btn"><i class="fa-solid fa-trash"></i></div>
-                        </a>
-                    {% endif %}
-                </div>
+                    </div>
 
-                <div style="height: 320px; background-color: black;" class="d-flex align-items-center justify-content-center overflow-hidden">
-                    <img src="{{ post.meme }}" class="card-img-top" alt="{{ post.title }}">
-                </div>
-
-                <div class="card-footer d-flex justify-content-between bg-white">
-                    <a href="{{url_for('home.fav', post_id=post.id)}}">
-                        <button class="btn" type="button">
-                            {% if post in current_user.favorited_posts %}
-                                <i class="fa-solid fa-heart" style="color: red;"></i>
-                            {% else %}
-                                <i class="fa-regular fa-heart" style="color: red;"></i>
-                            {% endif %}
-                        </button>
-                    </a>
-                    
-                    <a href="{{url_for('home.download', post_id=post.id)}}">
-                        <div class="btn"><i class="fa-solid fa-download" style="color: green;"></i></div>
-                    </a>
-
-                    <button type="button" 
-                        class="btn border-0 share-btn" 
-                        data-title="{{ post.title }}" 
-                        data-url="{{ post.meme }}">
-                        <i class="fa-solid fa-share" style="color: blue;"></i>
-                    </button>
-                </div>
-            </div>
+            {% endfor %}
         </div>
-        {% endfor %}
     </div>
-</div>
+
 {% else %}
     <h1 class="d-flex justify-content-center mt-5 mb-5">No favorite posts</h1>
 {% endif %}
+
+<script>
+function toggleFavorite(button) {
+    const icon = button.querySelector("i");
+
+    icon.classList.toggle("fa-regular");
+    icon.classList.toggle("fa-solid");
+}
+</script>
 
 <script>
 document.addEventListener("DOMContentLoaded", function () {
@@ -94,7 +102,7 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     });
 });
-</script>
+</script>   
 
 
 {% endblock %}
