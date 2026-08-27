@@ -1,0 +1,100 @@
+{% extends "main.html" %}
+{% block content %}
+
+<div class="container mt-4 d-flex justify-content-center">
+    <div class="card shadow-sm border-0" style="max-width: 650px; width: 100%;">
+        
+        <!-- Header: Title, Date, Actions -->
+        <div class="card-header d-flex bg-white justify-content-between align-items-center py-2">
+            <div>
+                <h5 class="m-0 text-truncate" style="font-weight: 700; max-width: 250px;">{{ post.title }}</h5>
+                <small class="text-muted d-block" style="font-size: 0.75rem;">{{ post.formatted_date }}</small>
+            </div>
+
+            <div class="d-flex align-items-center gap-2">
+                <!-- Download Button -->
+                <a href="{{ url_for('home.download', post_id=post.id) }}" class="btn btn-sm btn-light text-secondary" title="Download Meme">
+                    <i class="fa-solid fa-download"></i>
+                </a>
+
+                <!-- Native Inbuilt Share Button -->
+                <button type="button" class="btn btn-sm btn-light text-secondary" title="Share Meme" 
+                        onclick="sharePost('{{ post.title }}', window.location.href)">
+                    <i class="fa-solid fa-share-nodes"></i>
+                </button>
+
+                <!-- Delete Button (Shown only to post owner via local token) -->
+                <form action="{{ url_for('home.del_post', id=post.id) }}" method="POST" id="del-form-{{ post.id }}" style="display: none; margin: 0;">
+                    <input type="hidden" name="token" id="token-input-{{ post.id }}">
+                    <button type="submit" class="btn btn-sm btn-light text-danger" title="Delete your post" onclick="return confirm('Delete this meme?')">
+                        <i class="fa-solid fa-trash"></i>
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Meme Image Display -->
+        <div class="bg-dark text-center">
+            <img src="{{ post.meme }}" class="img-fluid" alt="{{ post.title }}" style="max-height: 600px; width: auto;">
+        </div>
+
+        <!-- Card Footer: Back Link -->
+        <div class="card-footer bg-white d-flex justify-content-between align-items-center py-2">
+            <a href="{{ url_for('home.index') }}" class="btn btn-sm btn-outline-secondary">
+                <i class="fa-solid fa-arrow-left me-1"></i> Back to Feed
+            </a>
+        </div>
+    </div>
+</div>
+
+<script>
+    // 1. Inbuilt Native Web Share API + Clipboard Fallback
+    async function sharePost(title, fullUrl) {
+        if (navigator.share) {
+            try {
+                await navigator.share({
+                    title: title,
+                    text: `Check out this meme: ${title}`,
+                    url: fullUrl
+                });
+            } catch (err) {
+                if (err.name !== 'AbortError') {
+                    console.error("Share failed:", err);
+                }
+            }
+        } else {
+            fallbackCopy(fullUrl);
+        }
+    }
+
+    function fallbackCopy(text) {
+        if (navigator.clipboard && window.isSecureContext) {
+            navigator.clipboard.writeText(text).then(() => alert("Link copied to clipboard!"));
+        } else {
+            let tempInput = document.createElement("input");
+            tempInput.value = text;
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            document.execCommand("copy");
+            document.body.removeChild(tempInput);
+            alert("Link copied to clipboard!");
+        }
+    }
+
+    // 2. Reveal delete button if this browser owns the deletion token for this post
+    document.addEventListener("DOMContentLoaded", function () {
+        let myTokens = JSON.parse(localStorage.getItem('my_post_tokens') || '{}');
+        let currentPostId = "{{ post.id }}";
+        
+        if (myTokens[currentPostId]) {
+            let form = document.getElementById(`del-form-${currentPostId}`);
+            let input = document.getElementById(`token-input-${currentPostId}`);
+            if (form && input) {
+                input.value = myTokens[currentPostId];
+                form.style.display = 'inline-block';
+            }
+        }
+    });
+</script>
+
+{% endblock %}

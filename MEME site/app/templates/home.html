@@ -1,100 +1,146 @@
-{% extends 'main.html' %}
-{% block title %}Memeify-Home{% endblock %}
-{% block head %}
-<link rel="stylesheet" href="/static/css/home.css">
-{% endblock %}
-
+{% extends "main.html" %}
 {% block content %}
-<div class="container d-flex justify-content-center">
-    <img src="/static/imgs/ShareMemes.gif" style="max-width: 100%;" class="d-flex justify-content-center mb-4 mt-2">
-</div>
 
-<div class="container mt-0 my-4">
-    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+<div class="container mt-4">
+    <div class="row">
         {% for post in posts %}
-        <div class="col">
-            <div class="card">
-                <div class="card-header d-flex bg-white">
-                    {% if current_user.id == post.user.id %}
-                        <div class="container d-flex p-0">
-                            <p style="font-weight: 700;">{{post.title}}</p>
-                            <p style="opacity: 0.7; margin-left: 5px; margin-right: 5px;">•</p>
-                            <p style="opacity: 0.7;">@{{post.user.username}}</p> 
-                        </div>
-                    {% else %}
-                        <div class="container d-flex p-0 justify-content-between">
-                            <p style="font-weight: 700;">{{post.title}}</p>
-                            <p style="opacity: 0.7;">@{{post.user.username}}</p> 
-                        </div>
-                    {% endif %}
-                    
-                    {% if current_user.id == post.user.id %} 
-                        <a style="color: red;" href="{{url_for('home.del_post', id=post.id)}}">
-                            <div class="btn"><i class="fa-solid fa-trash"></i></div>
+        <div class="col-md-4 mb-4">
+            <div class="card shadow-sm border-0">
+                <div class="card-header d-flex bg-white justify-content-between align-items-center py-2">
+                    <div>
+                        <p class="m-0 text-truncate" style="font-weight: 700; max-width: 150px;">{{ post.title }}</p>
+                        <small class="text-muted d-block" style="font-size: 0.75rem;">{{ post.formatted_date }}</small>
+                    </div>
+
+                    <div class="d-flex align-items-center gap-2">
+                        <!-- Download Button -->
+                        <a href="{{ url_for('home.download', post_id=post.id) }}" class="btn btn-sm btn-light text-secondary" title="Download Meme">
+                            <i class="fa-solid fa-download"></i>
                         </a>
-                    {% endif %}
-                </div>
 
-                <div style="height: 320px; background-color: black;" class="d-flex align-items-center justify-content-center overflow-hidden">
-                    <img src="{{ post.meme }}" class="card-img-top" alt="{{ post.title }}">
-                </div>
-
-                <div class="card-footer d-flex justify-content-between bg-white">
-                    <a href="{{url_for('home.fav', post_id=post.id)}}">
-                        <button class="btn" type="button">
-                            {% if post in current_user.favorited_posts %}
-                                <i class="fa-solid fa-heart" style="color: red;"></i>
-                            {% else %}
-                                <i class="fa-regular fa-heart" style="color: red;"></i>
-                            {% endif %}
+                        <!-- Share Button -->
+                        <button type="button" class="btn btn-sm btn-light text-secondary" title="Share Meme" 
+                                onclick="sharePost('{{ post.title }}', window.location.origin + '{{ url_for('home.view_post', post_id=post.id) }}')">
+                            <i class="fa-solid fa-share-nodes"></i>
                         </button>
-                    </a>
-                    
-                    <a href="{{url_for('home.download', post_id=post.id)}}">
-                        <div class="btn"><i class="fa-solid fa-download" style="color: green;"></i></div>
-                    </a>
 
-                    <button type="button" 
-                        class="btn border-0 share-btn" 
-                        data-title="{{ post.title }}" 
-                        data-url="{{ post.meme }}">
-                        <i class="fa-solid fa-share" style="color: blue;"></i>
-                    </button>
+                        <!-- Delete Trigger Button (Opens Modal Card) -->
+                        <button type="button" class="btn btn-sm btn-light text-danger del-btn-{{ post.id }}" style="display: none;" title="Delete your post" 
+                                onclick="openDeleteModal('{{ post.id }}', '{{ post.title }}')">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </div>
                 </div>
+
+                <a href="{{ url_for('home.view_post', post_id=post.id) }}">
+                    <img src="{{ post.meme }}" class="card-img-top" alt="{{ post.title }}" style="object-fit: cover; max-height: 400px;">
+                </a>
             </div>
         </div>
         {% endfor %}
     </div>
 </div>
 
+<!-- Bootstrap Card Modal for Deletion Confirmation -->
+<div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header bg-danger text-white py-3">
+                <h5 class="modal-header-title m-0 fs-6 fw-bold" id="deleteModalLabel">
+                    <i class="fa-solid fa-triangle-exclamation me-2"></i> Confirm Deletion
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body py-4 text-center">
+                <p class="mb-1 text-muted">Are you sure you want to delete this post?</p>
+                <h6 class="fw-bold text-dark mb-0 text-truncate px-3" id="deleteModalPostTitle"></h6>
+            </div>
+            <div class="modal-footer bg-light border-0 d-flex justify-content-end gap-2">
+                <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                
+                <form id="activeDeleteForm" action="" method="POST" class="m-0">
+                    <input type="hidden" name="token" id="activeDeleteToken">
+                    <button type="submit" class="btn btn-sm btn-danger">Yes, Delete</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
-document.addEventListener("DOMContentLoaded", function () {
-    document.querySelectorAll(".share-btn").forEach(button => {
-        button.addEventListener("click", function (e) {
-            e.preventDefault();
+    let activePostId = null;
 
-            const title = this.getAttribute("data-title");
-            const imageUrl = this.getAttribute("data-url"); // Directly holds the Cloudinary URL
+    function openDeleteModal(postId, postTitle) {
+        activePostId = postId;
+        
+        // Populate modal data
+        document.getElementById('deleteModalPostTitle').innerText = postTitle;
+        document.getElementById('activeDeleteForm').action = "/del_post/" + postId;
+        
+        // Inject token into hidden form input
+        let myTokens = JSON.parse(localStorage.getItem('my_post_tokens') || '{}');
+        document.getElementById('activeDeleteToken').value = myTokens[postId] || '';
 
-            if (navigator.share) {
-                navigator.share({
+        // Show Bootstrap Modal
+        let delModal = new bootstrap.Modal(document.getElementById('deleteConfirmModal'));
+        delModal.show();
+    }
+
+    // 1. Inbuilt Native Web Share API + Clipboard Fallback
+    async function sharePost(title, fullUrl) {
+        if (navigator.share) {
+            try {
+                await navigator.share({
                     title: title,
-                    text: `Check out this meme: "${title}"`,
-                    url: imageUrl
-                }).catch(err => {
-                    if (err.name !== 'AbortError') console.error("Share error:", err);
+                    text: `Check out this meme: ${title}`,
+                    url: fullUrl
                 });
-            } else if (navigator.clipboard) {
-                navigator.clipboard.writeText(imageUrl).then(() => {
-                    alert("Meme link copied to clipboard!");
-                });
-            } else {
-                alert("Share link: " + imageUrl);
+            } catch (err) {
+                if (err.name !== 'AbortError') {
+                    console.error("Share failed:", err);
+                }
             }
-        });
-    });
-});
-</script>
+        } else {
+            fallbackCopy(fullUrl);
+        }
+    }
 
+    function fallbackCopy(text) {
+        if (navigator.clipboard && window.isSecureContext) {
+            navigator.clipboard.writeText(text).then(() => alert("Link copied to clipboard!"));
+        } else {
+            let tempInput = document.createElement("input");
+            tempInput.value = text;
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            document.execCommand("copy");
+            document.body.removeChild(tempInput);
+            alert("Link copied to clipboard!");
+        }
+    }
+
+    // 2. Save post token to localStorage upon fresh creation
+    const urlParams = new URLSearchParams(window.location.search);
+    const createdId = urlParams.get('created_id');
+    const token = urlParams.get('token');
+
+    if (createdId && token) {
+        let myTokens = JSON.parse(localStorage.getItem('my_post_tokens') || '{}');
+        myTokens[createdId] = token;
+        localStorage.setItem('my_post_tokens', JSON.stringify(myTokens));
+        window.history.replaceState({}, document.title, window.location.pathname);
+    }
+
+    // 3. Reveal delete buttons only for posts created by this browser
+    document.addEventListener("DOMContentLoaded", function () {
+        let myTokens = JSON.parse(localStorage.getItem('my_post_tokens') || '{}');
+        for (let postId in myTokens) {
+            let btn = document.querySelector(`.del-btn-${postId}`);
+            if (btn) {
+                btn.style.display = 'inline-block';
+            }
+        }
+    });
+</script>
 
 {% endblock %}

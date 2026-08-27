@@ -1,6 +1,5 @@
 import os
 from flask import Flask
-from flask_login import LoginManager
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from app.extentions import bcrypt
@@ -15,6 +14,7 @@ def create_app():
     upload_folder = os.path.join(app.root_path, 'static', 'uploads')
     os.makedirs(upload_folder, exist_ok=True)
     app.config['UPLOAD_FOLDER'] = upload_folder
+    
     
     # Check for Render's DATABASE_URL first; fall back to SQLite for local development
     database_url = os.environ.get('DATABASE_URL')
@@ -33,25 +33,11 @@ def create_app():
     migrate = Migrate()
     migrate.init_app(app, db)
 
-    login_manager = LoginManager()
-    login_manager.init_app(app)
-    login_manager.login_view = 'auth.login'
-    login_manager.login_message = "You must be logged in to view this content."
-    login_manager.login_message_category = "warning"
-
-    from app.models import User, Post,favorites
-    @login_manager.user_loader
-    def load_user(id):
-        return User.query.get(id)
-
-    # Import and register blueprints
+    # Import and register only the home blueprint
     from app.routes.home import home
-    from app.routes.auth import auth
-
     app.register_blueprint(home)
-    app.register_blueprint(auth, url_prefix='/auth')
 
-    # Create PostgreSQL database tables automatically on startup
+    # Create database tables automatically on startup
     with app.app_context():
         db.create_all()
 
