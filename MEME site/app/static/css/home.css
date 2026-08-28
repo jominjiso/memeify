@@ -3,8 +3,10 @@
 }
 
 .gallery-container {
-  column-count: 3; /* Number of columns */
-  column-gap: 16px; /* Horizontal space between columns */
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 16px;
+  grid-template-rows: masonry; /* Automatically tucks items up under short cards */
 }
 
 .card {
