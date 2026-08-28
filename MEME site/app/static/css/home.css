@@ -1,3 +1,20 @@
 #heart{
     color: red;
 }
+
+.gallery-container {
+  column-count: 3; /* Number of columns */
+  column-gap: 16px; /* Horizontal space between columns */
+}
+
+.card {
+  break-inside: avoid; /* Prevents a card from splitting across columns */
+  margin-bottom: 16px; /* Vertical space between stacked cards */
+}
+
+/* Mobile responsive layout */
+@media (max-width: 768px) {
+  .gallery-container {
+    column-count: 2;
+  }
+}
