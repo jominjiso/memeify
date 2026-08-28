@@ -9,7 +9,8 @@ import cloudinary.uploader
 from app.models import Post
 from app import db
 
-home = Blueprint('home', __name__, template_folder='templates', static_folder='static', static_url_path='/app')
+# Clean Blueprint definition using default template routing
+home = Blueprint('home', __name__)
 
 @home.route('/')
 def index():
@@ -88,3 +89,7 @@ def download(post_id):
 def view_post(post_id):
     post = Post.query.get_or_404(post_id)
     return render_template('post.html', post=post)
+
+@home.route('/about')
+def about():
+    return render_template('about.html')

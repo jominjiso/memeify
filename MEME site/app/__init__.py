@@ -15,16 +15,15 @@ def create_app():
     os.makedirs(upload_folder, exist_ok=True)
     app.config['UPLOAD_FOLDER'] = upload_folder
     
-    
-    # Check for Render's DATABASE_URL first; fall back to SQLite for local development
-    database_url = os.environ.get('DATABASE_URL')
-    if database_url:
-        # Fix Render's legacy 'postgres://' prefix for SQLAlchemy compatibility
-        if database_url.startswith("postgres://"):
-            database_url = database_url.replace("postgres://", "postgresql://", 1)
-        app.config['SQLALCHEMY_DATABASE_URI'] = database_url
-    else:
-        app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///./meme.db'
+    # Fetch DATABASE_URL from Render env, or fallback directly to your Render DB string locally
+    DATABASE_URL = os.environ.get('DATABASE_URL') or "postgresql://memefiy_user:mT5T7LhfeOVS6GRsQq1MJcXlmUo0Z4VN@dpg-da6jdqv10e5c73bu41t0-a.oregon-postgres.render.com/memefiy"
+
+    # Fix legacy postgres:// prefix for SQLAlchemy compatibility
+    if DATABASE_URL.startswith("postgres://"):
+        DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
+        
+    # Assign the final DATABASE_URL unconditionally
+    app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URL
     
     # Initialize extensions
     db.init_app(app)
@@ -37,7 +36,7 @@ def create_app():
     from app.routes.home import home
     app.register_blueprint(home)
 
-    # Create database tables automatically on startup
+    # Create database tables automatically on startup   
     with app.app_context():
         db.create_all()
 

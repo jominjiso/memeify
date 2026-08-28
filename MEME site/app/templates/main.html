@@ -8,13 +8,27 @@
     <meta name="application-name" content="Memefiy">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="google-site-verification" content="x6rcLIyzzjZbR16thiHotGIjwaiktNe6EAb9VrWVz9g" />
-    <link rel="stylesheet" href="/static/css/main.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css">
+    
+    <!-- Dynamic Flask Static CSS Path -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='main.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='home.css') }}">
+
+    <!-- Bootstrap 5 CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+    
+    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Boldonse&family=Edu+NSW+ACT+Cursive:wght@400..700&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.3.0/css/all.min.css" integrity="sha512-ApSLB1Pd3/bZN8fWB/RG9YhN/7bd9Hkf3AGaE2mPfebjrxagjuBtx2GcgdqIlJkUzwylBo61r9Xa9NmgBI0swA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    
+    <!-- FontAwesome 6 Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <!-- Bootstrap 5 JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <link rel="stylesheet" href="/static/css/main.css">
+
     {% block head %}{% endblock %}
 </head>
 
@@ -22,41 +36,51 @@
 
     <nav class="navbar navbar-expand-md bg-black" id="nav">
         <div class="container-fluid">
-            <a href="{{ url_for('home.index') }}" class="navbar-brand" id="logo">Memefiy. </a>
+            <a href="{{ url_for('home.index') }}" class="navbar-brand" id="logo">Memefiy</a>
             
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-                <i class="fa-solid fa-ellipsis" id="dots"></i>
+            <button class="navbar-toggler text-white border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <i class="fa-solid fa-ellipsis fs-3" id="dots"></i>
             </button>
-        </div>
-        <div class="collapse navbar-collapse" id="navbarSupportedContent">
-            <a href="{{ url_for('home.index') }}" class="nav-link mx-sm-3 d-flex align-items-center"><i class="fa-solid fa-house mx-1"></i>Home</a>
-            <a href="{{ url_for('home.upload') }}" class="nav-link mx-sm-3 d-flex align-items-center"><i class="fa-regular fa-circle-up mx-1"></i>Upload</a>
+
+            <div class="collapse navbar-collapse justify-content-end" id="navbarSupportedContent">
+                <a href="{{ url_for('home.index') }}" class="nav-link mx-sm-3 d-flex align-items-center"><i class="fa-solid fa-house me-1"></i>Home</a>
+                <a href="{{ url_for('home.upload') }}" class="nav-link mx-sm-3 d-flex align-items-center"><i class="fa-regular fa-circle-up me-1"></i>Upload</a>
+                <a href="{{ url_for('home.about') }}" class="nav-link mx-sm-3 d-flex align-items-center"><i class="fa-solid fa-circle-info me-1"></i>About</a>
+            </div>
         </div>
     </nav>
 
+    <!-- Flash Alert Messages -->
     {% with messages = get_flashed_messages(with_categories=True) %}
         {% if messages %}
-            {% for category,msg in messages %}
-            <div class="alert alert-{{category}} alert-dismissible fade show" style="display: flex; align-items: center; justify-content: space-between;">
-                <strong>{{msg}}</strong>
-                <button id="butn" class="btn" data-bs-dismiss="alert"><i class="fa-regular fa-circle-xmark" style="font-size: x-large;"></i></button>
+            <div class="container mt-3">
+                {% for category, msg in messages %}
+                <div class="alert alert-{{ category }} alert-dismissible fade show d-flex align-items-center justify-content-between" role="alert">
+                    <strong>{{ msg }}</strong>
+                    <button type="button" class="btn p-0 border-0" data-bs-dismiss="alert" aria-label="Close">
+                        <i class="fa-regular fa-circle-xmark fs-4"></i>
+                    </button>
+                </div>
+                {% endfor %}
             </div>
-            {% endfor %}
         {% endif %}
     {% endwith %}
 
+    <!-- Main Page Content Block -->
     {% block content %}{% endblock %}
-    <p class="text-secondary text-center mt-4">2026 © Memefiy</p>
+
+    <footer class="text-secondary text-center mt-5 mb-3">
+        <p class="m-0">2026 © Memefiy</p>
+    </footer>
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-DGF37PWR2Y"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-DGF37PWR2Y');
+    </script>
 </body>
-
-<!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-DGF37PWR2Y"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-DGF37PWR2Y');
-</script>
-
 </html>
