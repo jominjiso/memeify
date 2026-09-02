@@ -2,14 +2,120 @@
 {% block content %}
 
 <div class="container mt-4">
-    <div class="row">
+    <!-- Header Section -->
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+        <h1 class="m-0 text-muted" style="color: black;">
+            <strong> 
+                {% if request.args.get('cat') %}
+                    {{ request.args.get('cat') }}
+                {% elif request.args.get('srch') %}
+                    <i class="fa-solid fa-magnifying-glass"></i> Search for: <small><em>{{request.args.get('srch')}}</em></small>    
+                {% else %}
+                    <i class="fa-solid fa-arrow-trend-up"></i> Trending
+                {% endif %}
+            </strong>
+        </h1>
+        
+        <div class="d-flex align-items-center gap-2">
+            <a href="{{ url_for('home.meme_roulette') }}" class="btn btn-outline-warning btn-sm">
+                <i class="fa-solid fa-dice"></i> Meme Roulette
+            </a>
+
+            <!-- Category Filter Dropdown -->
+            <div class="dropdown">
+                <button class="btn btn-sm btn-black text-warning border-warning dropdown-toggle fw-bold" 
+                        type="button" 
+                        id="filterCategoryDropdown" 
+                        data-bs-toggle="dropdown" 
+                        aria-expanded="false"
+                        style="background-color: #000; color: #ffea00 !important; border-color: #ffea00 !important;">
+                    <i class="fa-solid fa-filter me-1"></i>
+                    {% if request.args.get('cat') %}
+                        {{ request.args.get('cat') }}
+                    {% else %}
+                        All
+                    {% endif %}
+                </button>
+
+                <ul class="dropdown-menu dropdown-menu-end bg-black border-dark shadow mt-2" aria-labelledby="filterCategoryDropdown">
+                    <li>
+                        <a class="dropdown-item text-white {{ 'bg-warning text-dark fw-bold' if not request.args.get('cat') }}" 
+                           href="{{ url_for('home.index') }}">
+                            🔥 All Categories
+                        </a>
+                    </li>
+                    <li><hr class="dropdown-divider border-secondary"></li>
+                    <li>
+                        <a class="dropdown-item text-white {{ 'bg-warning text-dark fw-bold' if request.args.get('cat') == '💀BRUH' }}" 
+                           href="{{ url_for('home.index', cat='💀BRUH') }}">
+                            💀BRUH
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item text-white {{ 'bg-warning text-dark fw-bold' if request.args.get('cat') == '🤣Funny Reactions' }}" 
+                           href="{{ url_for('home.index', cat='🤣Funny Reactions') }}">
+                            🤣Funny Reactions
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item text-white {{ 'bg-warning text-dark fw-bold' if request.args.get('cat') == '🌚Dark Humor' }}" 
+                           href="{{ url_for('home.index', cat='🌚Dark Humor') }}">
+                            🌚Dark Humor
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item text-white {{ 'bg-warning text-dark fw-bold' if request.args.get('cat') == '🌐Internet Memes' }}" 
+                           href="{{ url_for('home.index', cat='🌐Internet Memes') }}">
+                            🌐Internet Memes
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item text-white {{ 'bg-warning text-dark fw-bold' if request.args.get('cat') == '😡Angry' }}" 
+                           href="{{ url_for('home.index', cat='😡Angry') }}">
+                            😡Angry
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item text-white {{ 'bg-warning text-dark fw-bold' if request.args.get('cat') == '🌌Nostalgia' }}" 
+                           href="{{ url_for('home.index', cat='🌌Nostalgia') }}">
+                            🌌Nostalgia
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item text-white {{ 'bg-warning text-dark fw-bold' if request.args.get('cat') == '😢Sad Memes' }}" 
+                           href="{{ url_for('home.index', cat='😢Sad Memes') }}">
+                            😢Sad Memes
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item text-white {{ 'bg-warning text-dark fw-bold' if request.args.get('cat') == '🧠Overthinking' }}" 
+                           href="{{ url_for('home.index', cat='🧠Overthinking') }}">
+                            🧠Overthinking
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item text-white {{ 'bg-warning text-dark fw-bold' if request.args.get('cat') == '🎓Collage Memes' }}" 
+                           href="{{ url_for('home.index', cat='🎓Collage Memes') }}">
+                            🎓Collage Memes
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+        </div>
+    </div>
+    
+    <!-- True Pure CSS Masonry Feed -->
+    <div class="masonry-feed">
         {% for post in posts %}
-        <div class="col-md-4 mb-4">
+        <div class="masonry-item">
             <div class="card shadow-sm border-0">
                 <div class="card-header d-flex bg-white justify-content-between align-items-center py-2">
                     <div>
                         <p class="m-0 text-truncate" style="font-weight: 700; max-width: 150px;">{{ post.title }}</p>
                         <small class="text-muted d-block" style="font-size: 0.75rem;">{{ post.formatted_date }}</small>
+                        <small class="text-muted"><i class="fa-solid fa-hand-pointer"></i> {{ post.click | default(0) }}</small>•
+                        <small><span class="badge bg-secondary">{{ post.category if post.category else 'trending' }}</span></small>
                     </div>
 
                     <div class="d-flex align-items-center gap-2">
@@ -24,7 +130,7 @@
                             <i class="fa-solid fa-share-nodes"></i>
                         </button>
 
-                        <!-- Delete Trigger Button (Opens Modal Card) -->
+                        <!-- Delete Trigger Button -->
                         <button type="button" class="btn btn-sm btn-light text-danger del-btn-{{ post.id }}" style="display: none;" title="Delete your post" 
                                 onclick="openDeleteModal('{{ post.id }}', '{{ post.title }}')">
                             <i class="fa-solid fa-trash"></i>
@@ -33,9 +139,14 @@
                 </div>
 
                 <a href="{{ url_for('home.view_post', post_id=post.id) }}">
-                    <img src="{{ post.meme }}" class="card-img-top" alt="{{ post.title }}" style="object-fit: cover; max-height: 400px;">
+                    <img src="{{ post.meme }}" class="card-img-top w-100" alt="{{ post.title }}" style="display: block; height: auto;">
                 </a>
             </div>
+        </div>
+        {% else %}
+        <div class="text-center py-5">
+            <h4 class="text-muted">No memes found!</h4>
+            <a href="{{ url_for('home.upload') }}" class="btn btn-warning mt-2">Upload One Now</a>
         </div>
         {% endfor %}
     </div>
@@ -73,20 +184,16 @@
     function openDeleteModal(postId, postTitle) {
         activePostId = postId;
         
-        // Populate modal data
         document.getElementById('deleteModalPostTitle').innerText = postTitle;
         document.getElementById('activeDeleteForm').action = "/del_post/" + postId;
         
-        // Inject token into hidden form input
         let myTokens = JSON.parse(localStorage.getItem('my_post_tokens') || '{}');
         document.getElementById('activeDeleteToken').value = myTokens[postId] || '';
 
-        // Show Bootstrap Modal
         let delModal = new bootstrap.Modal(document.getElementById('deleteConfirmModal'));
         delModal.show();
     }
 
-    // 1. Inbuilt Native Web Share API + Clipboard Fallback
     async function sharePost(title, fullUrl) {
         if (navigator.share) {
             try {
@@ -119,7 +226,6 @@
         }
     }
 
-    // 2. Save post token to localStorage upon fresh creation
     const urlParams = new URLSearchParams(window.location.search);
     const createdId = urlParams.get('created_id');
     const token = urlParams.get('token');
@@ -131,7 +237,6 @@
         window.history.replaceState({}, document.title, window.location.pathname);
     }
 
-    // 3. Reveal delete buttons only for posts created by this browser
     document.addEventListener("DOMContentLoaded", function () {
         let myTokens = JSON.parse(localStorage.getItem('my_post_tokens') || '{}');
         for (let postId in myTokens) {

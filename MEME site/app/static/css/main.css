@@ -16,6 +16,12 @@
     filter: invert(1);
 
 }
+
+.nav-btn{
+    color: #FFF000;
+    font-weight: 800;
+    font-size: larger;
+}
 #dots{
     color: #FFF000;
 }
@@ -23,3 +29,29 @@
 #butn{
     margin-right: -2.5rem;
 }
+/* CSS Masonry Feed Container */
+    .masonry-feed {
+        column-count: 3;
+        column-gap: 1.5rem;
+    }
+
+    /* Prevent cards from breaking across columns */
+    .masonry-item {
+        break-inside: avoid;
+        margin-bottom: 1.5rem;
+        display: inline-block;
+        width: 100%;
+    }
+
+    /* Responsive Column Breaks */
+    @media (max-width: 992px) {
+        .masonry-feed {
+            column-count: 2;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .masonry-feed {
+            column-count: 1;
+        }
+    }

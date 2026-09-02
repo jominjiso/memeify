@@ -13,7 +13,35 @@
         <div class="form-floating mb-2 mt-2 ">
             <input type="text" class="form-control mb-3" placeholder="Enter Title" id="title" name="title" required="required">
             <label for="title">Title</label>
-         </div>
+        </div>
+
+        <div class="mb-4">
+            <label for="categorySelect" class="form-label fw-bold text-dark fs-6">
+                <i class="fa-solid fa-tags text-warning me-1"></i> Choose Category
+            </label>
+            
+            <div class="input-group">
+                <span class="input-group-text bg-black text-warning border-black">
+                    <i class="fa-solid fa-folder-open"></i>
+                </span>
+                <select class="form-select border-dark shadow-sm py-2" id="categorySelect" name="category" required>
+                    <option disabled selected hidden>Select a meme category...</option>
+                    <option value="💀BRUH">💀BRUH</option>
+                    <option value="🤣Funny Reactions">🤣Funny Reactions</option>
+                    <option value="🌚Dark Humor">🌚Dark Humor</option>
+                    <option value="🌐Internet Memes">🌐Internet Memes</option>
+                    <option value="😡Angry">😡Angry</option>
+                    <option value="🌌Nostalgia">🌌Nostalgia</option>
+                    <option value="😢Sad Memes">😢Sad Memes</option>
+                    <option value="🧠Overthinking">🧠Overthinking</option>
+                    <option value="🎓Collage Memes">🎓Collage Memes</option>                    
+                </select>
+            </div>
+            <div class="form-text text-muted">
+                Categorizing your meme helps it reach the right feed.
+            </div>
+        </div>
+
         <div class="mb-3">
             <label for="formFile" class="form-label">Choose file</label>
             <input class="form-control" type="file" id="formFile" name="meme">

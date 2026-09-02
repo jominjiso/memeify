@@ -2,20 +2,43 @@ import os
 import uuid
 import requests
 from io import BytesIO
-from flask import Blueprint, render_template, flash, request, redirect, url_for, send_file
+from flask import Blueprint, render_template, flash, request, redirect, url_for, send_file,session
 import cloudinary
 import cloudinary.uploader
+from sqlalchemy import func, or_
 
 from app.models import Post
 from app import db
 
+
 # Clean Blueprint definition using default template routing
 home = Blueprint('home', __name__)
 
-@home.route('/')
+@home.route('/', methods=['GET', 'POST'])
 def index():
-    posts = Post.query.all()
-    return render_template('home.html', posts=posts)
+    selected_category = request.args.get('cat')
+    srch = request.args.get('srch')
+
+    query = Post.query.order_by(Post.click.desc())
+
+    # 1. Apply search filter if present
+    if srch and srch.strip():
+        search_term = f"%{srch.strip()}%"
+        query = query.filter(
+            or_(
+                Post.title.ilike(search_term),
+                Post.category.ilike(search_term)
+            )
+        )
+
+    # 2. Apply category filter if present (chains onto search query!)
+    if selected_category and selected_category.strip():
+        query = query.filter(Post.category == selected_category.strip())
+
+    # 3. Execute the combined query ONCE
+    posts = query.all()
+
+    return render_template('home.html', posts=posts, srch=srch, selected_category=selected_category)
 
 @home.route('/upload', methods=['GET', 'POST'])
 def upload():
@@ -25,6 +48,8 @@ def upload():
     elif request.method == 'POST':
         title = request.form.get('title')
         meme = request.files.get('meme')
+        # Default to '💀BRUH' if category form field is empty
+        category = request.form.get('category') or '💀BRUH'
         meme_url = None
 
         if meme and meme.filename != '':
@@ -33,9 +58,9 @@ def upload():
 
             if ext.lower() in allowed_ext:
                 cloudinary.config(
-                    cloud_name="qpf3nomd",
-                    api_key="865614548478618",
-                    api_secret="jyin_T9TRUI0E1HPv5qDbepmV10",
+                    cloud_name=os.getenv("CLOUDINARY_CLOUD_NAME", "qpf3nomd"),
+                    api_key=os.getenv("CLOUDINARY_API_KEY", "865614548478618"),
+                    api_secret=os.getenv("CLOUDINARY_API_SECRET", "jyin_T9TRUI0E1HPv5qDbepmV10"),
                     secure=True
                 )
                 upload_result = cloudinary.uploader.upload(meme)
@@ -45,7 +70,7 @@ def upload():
                 return redirect(url_for('home.upload'))
         
         token = str(uuid.uuid4())
-        post = Post(title=title, meme=meme_url, delete_token=token)
+        post = Post(title=title, meme=meme_url, delete_token=token, category=category)
         db.session.add(post)
         db.session.commit()
         
@@ -88,8 +113,25 @@ def download(post_id):
 @home.route('/post/<int:post_id>')
 def view_post(post_id):
     post = Post.query.get_or_404(post_id)
+
+    viewed = session.get('viewed_post', [])
+
+    if post.click is None:
+        post.click = 0
+
+    if post_id not in viewed:
+        post.click += 1
+        db.session.commit()
+        viewed.append(post_id)
+        session['viewed_post'] = viewed
+
     return render_template('post.html', post=post)
 
 @home.route('/about')
 def about():
     return render_template('about.html')
+
+@home.route('/meme-roulette')
+def meme_roulette():
+    post = Post.query.order_by(func.random()).first_or_404()
+    return redirect(url_for('home.view_post', post_id=post.id))
